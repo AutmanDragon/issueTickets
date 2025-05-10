@@ -9,6 +9,8 @@ const fs = require('fs');
 const app = express();
 const port = 3000;
 
+app.use(express.json());
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
@@ -59,7 +61,7 @@ const uploads = multer({
 
 // 📩 API: รับฟอร์มแจ้งปัญหา + แนบไฟล์
 app.post('/api/tickets', uploads.array('files'), async (req, res) => {
-  
+
   const { title, description, type, priority, contact, department } = req.body;
   const uploadFiles = req.files || [];
   const filenames = uploadFiles.map(f => f.filename); // เป็น array
@@ -79,10 +81,30 @@ app.post('/api/tickets', uploads.array('files'), async (req, res) => {
   }
 });
 
-app.get('/api/tickets/get', async (req, res) => {
+// ✅ API: เปลี่ยนสถานะของ ticket ตาม id
+app.put('/api/tickets/:id', async (req, res) => {
+  const ticketId = req.params.id;
+  const { status } = req.body;
+  console.log(status)
+  try {
+    await pool.query(
+      'UPDATE tickets SET status = $1 WHERE id = $2',
+      [status, ticketId]
+    )
+    res.status(200).json({ message: 'Status updated' })
+  } catch (error) {
+    console.error('Error updating status:', error)
+    res.status(500).json({ error: 'Failed to update status' })
+  }
+})
+
+
+// API: สำหรับดึงTicket ไปใช้หน้า browser
+app.get('/api/tickets', async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, title, description, type, priority, contact, department, file_path, status FROM tickets`
+      `SELECT id, title, description, type, priority, contact, department, file_path, status FROM tickets 
+      ORDER BY ID ASC`
     );
 
     res.status(200).json(result.rows);
@@ -97,5 +119,5 @@ app.get('/api/tickets/get', async (req, res) => {
 // 🚀 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
   console.log(`✅ Server is running at http://localhost:${port}`);
-  
+
 });

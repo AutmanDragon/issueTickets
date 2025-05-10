@@ -11,7 +11,7 @@
   </template>
   
   <script setup>
-  import Sidebar from '@/components/Sidebar.vue'
+ 
   import Topbar from '@/components/Topbar.vue'
   import TicketForm from '@/components/TicketForm.vue'
   </script>

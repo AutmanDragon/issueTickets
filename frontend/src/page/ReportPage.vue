@@ -11,7 +11,9 @@
 </template>
 
 <script setup>
-import Sidebar from '@/components/Sidebar.vue'
+
 import Topbar from '@/components/Topbar.vue'
 import ReportTable from '@/components/ReportTable.vue' // ถ้าแยกแล้ว
+
+
 </script>
