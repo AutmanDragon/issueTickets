@@ -38,7 +38,7 @@ const showDropdown = ref(false)
 const unreadCount = ref(0)
 const dropdownRef = ref(null)
 
-const userId = 123  // TODO: แก้ให้ดึงจากระบบ auth จริงของคุณ
+const userId = 1  // TODO: แก้ให้ดึงจากระบบ auth จริงของคุณ
 
 const res = await fetch(`http://localhost:3000/api/notifications/${userId}`);
 const notifications = await res.json();
