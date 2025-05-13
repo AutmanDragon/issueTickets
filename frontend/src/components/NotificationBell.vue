@@ -34,28 +34,23 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const showDropdown = ref(false)
-
+const notifications = ref([])
 const unreadCount = ref(0)
 const dropdownRef = ref(null)
-
-const userId = 1  // TODO: แก้ให้ดึงจากระบบ auth จริงของคุณ
-
-const res = await fetch(`http://localhost:3000/api/notifications/${userId}`);
-const notifications = await res.json();
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
 
-async function fetchNotifications() {
-  try {
-    const res = await fetch(`http://localhost:3000/api/notifications/in-progress/${userId}`)
-    const data = await res.json()
-    notifications.value = data
-    unreadCount.value = data.filter(n => !n.read).length
-  } catch (err) {
-    console.error("ไม่สามารถโหลดการแจ้งเตือนได้:", err)
-  }
+
+
+function fetchNotifications() {
+  notifications.value = [
+    { id: 1, message: "Ticket ใหม่เข้ามา", ticketId: "TK2505", timestamp: "2025-05-12T13:00:00", read: false },
+    { id: 2, message: "Ticket ถูกแก้ไข", ticketId: "TK2504", timestamp: "2025-05-12T12:45:00", read: true },
+    { id: 3, message: "Ticket กำลังดำเนินการ", ticketId: "TK2505", timestamp: "2025-05-12T12:45:00", read: true }
+  ]
+  unreadCount.value = notifications.value.filter(n => !n.read).length
 }
 
 function timeAgo(dateStr) {
@@ -64,11 +59,10 @@ function timeAgo(dateStr) {
 }
 
 function goToTicket(ticketId) {
-  const formattedId = 'TK' + String(ticketId).padStart(4, '0')
-  window.location.href = `/ticket/${formattedId}`
+  window.location.href = `/ticket/${ticketId}`
 }
 
-// 📌 จับคลิกนอก dropdown เพื่อปิด
+// 📌 ฟังก์ชันจับคลิกนอก dropdown
 function handleClickOutside(event) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     showDropdown.value = false
@@ -84,29 +78,41 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-// 🔁 โหลดแจ้งเตือนใหม่ทุก 30 วินาที
+
 setInterval(() => {
   fetchNotifications()
 }, 30000)
+
+
+
+
 </script>
+
+
+
+
 
 <style scoped>
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.2s ease;
 }
+
 .fade-slide-enter-from {
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .fade-slide-enter-to {
   opacity: 1;
   transform: translateY(0);
 }
+
 .fade-slide-leave-from {
   opacity: 1;
   transform: translateY(0);
 }
+
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-10px);

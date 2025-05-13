@@ -1,5 +1,6 @@
 <template>
   <tr class="border-b hover:bg-gray-50 transition">
+    
     <td class="p-3" style="text-align:center;">TK{{ formatDateCode(ticket.created_at) }}</td>
 
     <td class="p-3 relative group cursor-pointer max-w-xs">

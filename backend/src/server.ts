@@ -3,6 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import ticketRoutes from './routes/ticketRoutes';
 
+// import notificationsRouter from './routes/notifications';
+
+
+
 const app = express();
 const port = 3000;
 
@@ -16,6 +20,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 📌 ใช้งาน API: /api/tickets
 app.use('/api/tickets', ticketRoutes);
+
+// ✅ ใช้งาน notification routes
+// app.use('/api/notification', notificationsRouter);
 
 // 🚀 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
