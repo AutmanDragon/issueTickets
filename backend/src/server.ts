@@ -1,17 +1,24 @@
-import express, { Request, Response } from 'express'; //Create Web api
+import express, { Request, Response } from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';  //อ่านข้อมูลจากฟรอม express,json
+import bodyParser from 'body-parser';
 import { Pool } from 'pg';
-import multer from 'multer'; //รับไฟล์ upload
-import path from 'path'; 
-import fs from 'fs';  //จัดการไฟล์ โฟลเดอร์
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
-const app = express();
+// import notificationRoutes from './router/notifications'; // ✅ ยัง import ได้เหมือนเดิม
+
+const app = express(); // ✅ ต้องอยู่ก่อนใช้ app
 const port = 3000;
 
 app.use(express.json());
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+
+// ✅ ใช้ได้แล้ว เพราะประกาศ app แล้ว
+// app.use('/api/notifications', notificationRoutes);
+
+
 
 // :open_file_folder: Create uploads folder if it doesn't exist
 const uploadDir = 'uploads';

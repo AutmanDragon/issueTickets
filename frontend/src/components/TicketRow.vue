@@ -5,15 +5,16 @@
     <td class="p-3 relative group cursor-pointer max-w-xs">
       <div class="truncate">
         {{ ticket?.title }}
+
       </div>
 
       <!-- Tooltip -->
       <div
-  class="tooltip-fade absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 group-hover:translate-y-1 transition-all duration-200 delay-150 w-72 bg-gray-900 text-white text-sm rounded-lg p-3 shadow-xl pointer-events-none">
+        class="tooltip-fade absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 group-hover:translate-y-1 transition-all duration-200 delay-150 w-72 bg-gray-900 text-white text-sm rounded-lg p-3 shadow-xl pointer-events-none">
 
         <span class="break-words leading-snug max-h-40 overflow-y-auto">
           <strong class="block text-orange-400 mb-1">รายละเอียด:</strong>
-          <span class="text-white text-sm">{{ ticket.description}}</span>
+          <span class="text-white text-sm">{{ ticket.description }}</span>
         </span>
 
         <!-- Tooltip arrow -->
@@ -43,8 +44,29 @@
     <td class="p-3">{{ ticket.department }}</td>
 
     <!-- STATUS BADGE -->
-    <td class="p-3 whitespace-nowrap relative">
-      <span @click.stop="toggleStatusDropdown = !toggleStatusDropdown" :class="[
+    <td class="p-3 whitespace-nowrap">
+      <span :class="[
+        'px-2 py-1 rounded-full text-xs font-semibold capitalize',
+        ticket.status === 'open' ? 'bg-gray-200 text-gray-800' :
+          ticket.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+            ticket.status === 'done' ? 'bg-green-100 text-green-800' :
+              'bg-gray-100 text-gray-500' // fallback ถ้า status ไม่ตรง
+      ]">
+        {{
+          ticket.status === 'open'
+            ? 'ใหม่'
+            : ticket.status === 'in_progress'
+              ? 'กำลังดำเนินการ'
+              : ticket.status === 'done'
+                ? 'เสร็จสิ้น'
+                : ticket.status
+        }}
+      </span>
+    </td>
+
+
+
+    <!-- <span @click.stop="toggleStatusDropdown = !toggleStatusDropdown" :class="[
         'px-2 py-1 rounded-full text-xs font-semibold capitalize cursor-pointer',
         ticket?.status === 'open' ? 'bg-gray-200 text-gray-800' :
           ticket?.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
@@ -57,13 +79,13 @@
               ? 'กำลังดำเนินการ'
               : 'เสร็จสิ้น'
         }}
-      </span>
+      </span> -->
 
 
 
 
-      <!-- Dropdown for changing status -->
-      <div v-if="toggleStatusDropdown" ref="dropdownRef"
+    <!-- Dropdown for changing status -->
+    <!-- <div v-if="toggleStatusDropdown" ref="dropdownRef"
         class="absolute mt-1 bg-white border rounded shadow-md w-36 z-10">
         <ul>
           <li v-for="status in statusOptions" :key="status.value" @click="changeStatus(status.value)"
@@ -71,14 +93,19 @@
             {{ status.label }}
           </li>
         </ul>
-      </div>
-    </td>
+      </div> -->
+
 
 
 
     <td class="p-3 whitespace-nowrap text-sm text-gray-600">
       {{ formatDate(ticket.created_at) }}
+      <span class="ml-1">
+        <template v-if="props.sortOrder === 'asc'"></template>
+        <template v-else-if="props.sortOrder === 'desc'"></template>
+      </span>
     </td>
+
 
     <td class="p-3 whitespace-nowrap text-sm text-gray-600">
       {{ ticket.dev }}
@@ -110,6 +137,7 @@ const props = defineProps({
   ticket: Object,
   index: Number,
   onStatusChangeFn: Function,
+  sortOrder: String
 })
 
 const toggleStatusDropdown = ref(false)

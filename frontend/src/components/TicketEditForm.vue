@@ -12,7 +12,11 @@
   
         <div>
           <label class="block text-sm font-medium">ผู้รับผิดชอบ</label>
-          <input v-model="form.assignee" type="text" class="mt-1 w-full border rounded p-2" />
+         <select v-model="form.status" class="mt-1 w-full border rounded p-2">
+            <option value="Min">Min</option>
+            <option value="Mung">Mung</option>
+            <option value="Aot">Aot</option>
+          </select>
         </div>
   
         <div>
