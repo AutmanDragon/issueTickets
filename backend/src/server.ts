@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import ticketRoutes from './routes/ticketRoutes';
 
-// import notificationsRouter from './routes/notifications';
+import notificationsRouter from './routes/notifications';
 
 
 
@@ -22,7 +22,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/api/tickets', ticketRoutes);
 
 // ✅ ใช้งาน notification routes
-// app.use('/api/notification', notificationsRouter);
+app.use('/api/notifications', notificationsRouter);
+console.log('notificationsRouter:', typeof notificationsRouter);
+
 
 // 🚀 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {
