@@ -2,10 +2,15 @@
   <div class="relative" ref="dropdownRef">
     <button @click="toggleDropdown" class="relative">
       <span class="material-symbols-outlined text-2xl text-gray-700">notifications</span>
+
+      
+
       <span v-if="unreadCount > 0"
         class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
         {{ unreadCount }}
       </span>
+
+
     </button>
 
     <transition name="fade-slide">
