@@ -25,6 +25,7 @@
             <p class="text-sm flex items-center gap-2">
               <span class="material-symbols-outlined text-base text-blue-500">info</span>
               {{ noti.message }}
+              
             </p>
             <span class="text-xs text-gray-500">{{ timeAgo(noti.timestamp) }}</span>
           </li>
@@ -36,53 +37,51 @@
 </template>
 
 <script setup>
-
-import axios from 'axios'
-
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import axios from 'axios'
 
 const showDropdown = ref(false)
 const notifications = ref([])
 const unreadCount = ref(0)
 const dropdownRef = ref(null)
 
-
-const userId = 4 // 🔑 เปลี่ยนเป็น dynamic user ได้ในอนาคต
-
+const userId = 4 // 🔑 ให้ dynamic ได้ภายหลัง
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
-}
-
-
-// 📌 ฟังก์ชัน fetch notification จาก backend
-async function fetchNotifications() {
-  try {
-    const response = await axios.get(`http://localhost:3000/api/notifications/check-inprogress/${userId}`)
-
-    console.log('Notification API responese', response.data);
-
-    if (response.data.notify) {
-      // แปลงให้ match กับรูปแบบใน UI
-      const fetchedNotis = response.data.tickets.map((ticket) => ({
-        id: ticket.id,
-        message: response.data.message,
-        ticketId: `TK${ticket.id}`, // หรือใช้ ticket.id ตรงๆ ก็ได้
-        timestamp: new Date().toISOString(),
-        read: false
-      }))
-
-      // เพิ่มเข้า list
-      notifications.value.unshift(...fetchedNotis)
-      unreadCount.value = notifications.value.filter(n => !n.read).length
-      console.log(notifications.value)
-    }
-
-  } catch (error) {
-    console.error('ไม่สามารถโหลด notification:', error)
+  if (showDropdown.value) {
+    markUnreadAsRead()
   }
 }
 
+async function fetchNotifications() {
+  try {
+    const res = await axios.get(`http://localhost:3000/api/notifications/user/${userId}`)
+    notifications.value = res.data.map(n => ({
+      id: n.id,
+      message: n.message,
+      ticketId: n.ticket_id,
+      timestamp: n.created_at,
+      read: n.is_read
+    }))
+    unreadCount.value = notifications.value.filter(n => !n.read).length
+  } catch (err) {
+    console.error('โหลดแจ้งเตือนไม่ได้:', err)
+  }
+}
+
+async function markUnreadAsRead() {
+  const unread = notifications.value.filter(n => !n.read)
+  for (const noti of unread) {
+    try {
+      await axios.post(`http://localhost:3000/api/notifications/mark-read/${noti.id}`)
+      noti.read = true
+    } catch (err) {
+      console.error('Mark as read failed:', err)
+    }
+  }
+  unreadCount.value = 0
+}
 
 function timeAgo(dateStr) {
   const diff = Math.floor((new Date() - new Date(dateStr)) / 60000)
@@ -93,7 +92,6 @@ function goToTicket(ticketId) {
   window.location.href = `/ticket/${ticketId}`
 }
 
-// 📌 ฟังก์ชันจับคลิกนอก dropdown
 function handleClickOutside(event) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     showDropdown.value = false
@@ -109,12 +107,10 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
 })
 
-// 🔁 ดึงซ้ำทุก 30 วินาที
-setInterval(() => {
-  fetchNotifications()
-}, 30000)
-
+setInterval(fetchNotifications, 30000)
 </script>
+
+
 
 
 

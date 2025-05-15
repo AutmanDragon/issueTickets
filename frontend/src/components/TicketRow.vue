@@ -1,7 +1,7 @@
 <template>
   <tr class="border-b hover:bg-gray-50 transition">
     
-    <td class="p-3" style="text-align:center;">TK{{ formatDateCode(ticket.created_at) }}</td>
+     <td class="p-3" style="text-align:center;">{{ ticket?.ticket_id}}</td> 
 
     <td class="p-3 relative group cursor-pointer max-w-xs">
       <div class="truncate">
@@ -117,11 +117,11 @@
       <FileLinks :filePath="ticket.file_path" />
     </td> -->
 
-    <td class="p-3">
+     <!-- <td class="p-3">
       <router-link :to="`/edit/${ticket.id}`">
         <button class="text-orange-500 hover:underline">แก้ไข</button>
       </router-link>
-    </td>
+    </td>  -->
   </tr>
 
 
@@ -182,15 +182,15 @@ const formatDate = (isoDate) => {
   })
 
 }
-function formatDateCode(datetime) {
-  const d = new Date(datetime);
-  const yy = String(d.getFullYear()).slice(2); // ตัด 2 ตัวหน้า
-  const MM = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const hh = String(d.getHours()).padStart(2, '0');
-  const mm = String(d.getMinutes()).padStart(2, '0');
-  return `${yy}${MM}${dd}${hh}${mm}`;
-}
+// function formatDateCode(datetime) {
+//   const d = new Date(datetime);
+//   const yy = String(d.getFullYear()).slice(2); // ตัด 2 ตัวหน้า
+//   const MM = String(d.getMonth() + 1).padStart(2, '0');
+//   const dd = String(d.getDate()).padStart(2, '0');
+//   const hh = String(d.getHours()).padStart(2, '0');
+//   const mm = String(d.getMinutes()).padStart(2, '0');
+//   return `${yy}${MM}${dd}${hh}${mm}`;
+// }
 
 </script>
 

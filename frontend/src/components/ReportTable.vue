@@ -53,6 +53,8 @@ const filteredTickets = computed(() => {
             (ticket.status || '').toLowerCase().includes(keyword) ||
             (ticket.type || '').toLowerCase().includes(keyword) ||
 
+            (ticket.ticket_id || '').toLowerCase().includes(keyword) ||
+
             (ticket.dev || '').toLowerCase().includes(keyword) ||
 
             (ticket.priority || '').toLowerCase().includes(keyword)
@@ -170,7 +172,7 @@ onMounted(fetchTickets) // ใช้อันเดียวพอ
 
 
                         <th class="p-3">ผู้เเก้ไข</th>
-                        <th class="p-3">จัดการ</th>
+                        <!-- <th class="p-3">จัดการ</th> -->
 
                     </tr>
                 </thead>
