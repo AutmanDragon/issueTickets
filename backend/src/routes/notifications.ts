@@ -20,26 +20,27 @@ router.get('/check-inprogress/:userId', async (req: Request, res: Response) => {
   } else {
     try {
       const result = await pool.query(
-        `SELECT id, title FROM tickets WHERE user_id = $1 AND status = 'in_progress'`,
+        `SELECT id, ticket_id, title FROM tickets WHERE user_id = $1 AND status = 'in_progress'`,
         [userId]
       );
+
 
       const inProgressTickets = result.rows;
       const newNotifications = [];
 
       for (const ticket of inProgressTickets) {
         const exists = await pool.query(
-          `SELECT 1 FROM notifications WHERE user_id = $1 AND ticket_id = $2`,
+          `SELECT 1 FROM notifications WHERE user_id = $1 AND ticket_id = $2 AND type = 'in_progress_alert'`,
           [userId, ticket.id]
         );
 
         if (exists.rowCount === 0) {
-          const message = `เจ้าหน้าที่กำลังดำเนินการกับ ticket: ${ticket.title}`;
+          const message = `เจ้าหน้าที่กำลังดำเนินการกับ tickets รหัส ${ticket.ticket_id}`;
           await pool.query(
-            `INSERT INTO notifications (user_id, ticket_id, message) VALUES ($1, $2, $3)`,
-            [userId, ticket.id, message]
+            `INSERT INTO notifications (user_id, ticket_id, message, type, created_at) VALUES ($1, $2, $3, $4, NOW())`,
+            [userId, ticket.id, message, 'in_progress_alert']
           );
-          newNotifications.push({ ticket_id: ticket.id, title: ticket.title, message });
+          newNotifications.push({ ticket_id: ticket.ticket_id, title: ticket.title, message });
         }
       }
 
@@ -68,10 +69,13 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
     res.status(400).json({ error: 'Invalid user ID' });
   } else {
     try {
-      const result = await pool.query(
-        `SELECT * FROM notifications WHERE user_id = $1 ORDER BY created_at DESC`,
-        [userId]
-      );
+      const result = await pool.query(`
+  SELECT n.*, t.ticket_id AS ticket_code
+  FROM notifications n
+  LEFT JOIN tickets t ON n.ticket_id = t.id
+  WHERE n.user_id = $1
+  ORDER BY n.created_at DESC`, [userId]);
+
       res.json(result.rows);
     } catch (err) {
       console.error('Error fetching notifications:', err);
@@ -99,5 +103,71 @@ router.post('/mark-read/:notificationId', async (req: Request, res: Response) =>
     }
   }
 });
+
+
+// ✅ ตรวจสอบ tickets ที่ done และสร้าง notifications ใหม่หากยังไม่มี
+router.get('/check-done/:userId', async (req: Request, res: Response) => {
+  const userId = parseInt(req.params.userId);
+
+  if (!isNaN(userId)) {
+    try {
+      const result = await pool.query(
+        `SELECT id, title, ticket_id FROM tickets WHERE user_id = $1 AND status = 'done'`,
+        [userId]
+      );
+
+      const doneTickets = result.rows;
+      const newNotifications = [];
+
+      for (const ticket of doneTickets) {
+        const exists = await pool.query(
+          `SELECT 1 FROM notifications WHERE user_id = $1 AND ticket_id = $2 AND type = 'done_alert'`,
+          [userId, ticket.id]
+        );
+
+        if (exists.rowCount === 0) {
+          const message = `เจ้าหน้าที่ดำเนินการเสร็จสิ้นแล้วสำหรับ Ticket รหัส ${ticket.ticket_id}`;
+
+          await pool.query(
+            `INSERT INTO notifications (user_id, ticket_id, message, type, created_at)
+             VALUES ($1, $2, $3, $4, NOW())`,
+            [userId, ticket.id, message, 'done_alert']
+          );
+
+          newNotifications.push({
+            ticket_id: ticket.ticket_id,
+            title: ticket.title,
+            message,
+          });
+        }
+      }
+
+      if (newNotifications.length > 0) {
+        res.status(200).json({
+          notify: true,
+          message: 'พบงานที่เสร็จสมบูรณ์',
+          notifications: newNotifications,
+        });
+      } else {
+        res.json({ notify: false });
+      }
+
+    } catch (err) {
+      console.error('Error in /check-done:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+
+  } else {
+    res.status(400).json({ error: 'Invalid user ID' });
+  }
+});
+
+
+
+
+
+
+
+
 
 export default router;

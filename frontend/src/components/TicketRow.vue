@@ -117,11 +117,11 @@
       <FileLinks :filePath="ticket.file_path" />
     </td> -->
 
-     <!-- <td class="p-3">
+      <!-- <td class="p-3">
       <router-link :to="`/edit/${ticket.id}`">
         <button class="text-orange-500 hover:underline">แก้ไข</button>
       </router-link>
-    </td>  -->
+    </td>    -->
   </tr>
 
 
