@@ -1,62 +1,64 @@
 <template>
-    <form @submit.prevent="submit">
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium">สถานะใหม่</label>
-          <select v-model="form.status" class="mt-1 w-full border rounded p-2">
-            <option value="ใหม่">ใหม่</option>
-            <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
-            <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-          </select>
-        </div>
-  
-        <div>
-          <label class="block text-sm font-medium">ผู้รับผิดชอบ</label>
-         <select v-model="form.status" class="mt-1 w-full border rounded p-2">
-            <option value="Min">Min</option>
-            <option value="Mung">Mung</option>
-            <option value="Aot">Aot</option>
-          </select>
-        </div>
-  
-        <div>
-          <label class="block text-sm font-medium">หมายเหตุ</label>
-          <textarea v-model="form.note" rows="3" class="mt-1 w-full border rounded p-2" />
-        </div>
-  
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-          บันทึกการแก้ไข
-        </button>
-      </div>
-    </form>
-  </template>
-  
-  <script setup>
-  import { ref, watch } from 'vue';
-  
-  const props = defineProps({
-    ticket: Object
-  });
-  
-  const emit = defineEmits(['submit']);
-  
-  const form = ref({
-    status: '',
-    assignee: '',
-    note: ''
-  });
-  
-  watch(
-    () => props.ticket,
-    (newVal) => {
-      form.value.status = newVal.status;
-      form.value.assignee = newVal.assignee || '';
-    },
-    { immediate: true }
-  );
-  
-  const submit = () => {
-    emit('submit', form.value);
-  };
-  </script>
-  
+  <div class="max-w-xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-2xl font-bold mb-6">แก้ไข Ticket</h1>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-semibold mb-2">หัวข้อ:</label>
+      <input v-model="ticket.title" class="w-full border p-2 rounded" disabled />
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-semibold mb-2">รายละเอียด:</label>
+      <textarea v-model="ticket.description" class="w-full border p-2 rounded" rows="4" disabled></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-semibold mb-2">สถานะ:</label>
+      <select v-model="ticket.status" class="w-full border p-2 rounded">
+        <option value="open">ใหม่</option>
+        <option value="in_progress">กำลังดำเนินการ</option>
+        <option value="done">เสร็จสิ้น</option>
+      </select>
+    </div>
+
+    <button @click="updateStatus"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      บันทึกการเปลี่ยนแปลง
+    </button>
+  </div>
+</template>
+
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import axios from 'axios'
+
+
+const route = useRoute()
+const router = useRouter()
+
+const ticket = ref({
+  title: '',
+  description: '',
+  status: ''
+})
+
+const fetchTicket = async () => {
+  const id = route.params.id // เช่น TK25052001
+  const res = await axios.get(`/api/tickets/${id}`)
+  ticket.value = res.data
+}
+
+const updateStatus = async () => {
+  const id = route.params.id
+  await axios.put(`/api/tickets/${id}`, {
+    status: ticket.value.status
+  })
+  alert('อัปเดตสถานะเรียบร้อยแล้ว')
+  router.push('/') // เปลี่ยนไปหน้า list หรือหน้าหลัก
+}
+
+onMounted(fetchTicket)
+</script>
+

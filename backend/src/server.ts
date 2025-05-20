@@ -5,7 +5,7 @@ import ticketRoutes from './routes/ticketRoutes';
 
 import notificationsRouter from './routes/notifications';
 
-
+// import staffnotifications from './routes/Staffnotifications'
 
 const app = express();
 const port = 3000;
@@ -25,7 +25,7 @@ app.use('/api/tickets', ticketRoutes);
 app.use('/api/notifications', notificationsRouter);
 console.log('notificationsRouter:', typeof notificationsRouter);
 
-
+// app.use('/api/staffnotifications', staffnotifications )
 
 // 🚀 เริ่มต้นเซิร์ฟเวอร์
 app.listen(port, () => {

@@ -1,28 +1,25 @@
 <template>
   <tr class="border-b hover:bg-gray-50 transition">
-    
-     <td class="p-3" style="text-align:center;">{{ ticket?.ticket_id}}</td> 
+
+    <td class="p-3" style="text-align:center;">{{ ticket?.ticket_id }}</td>
 
     <td class="p-3 relative group cursor-pointer max-w-xs">
-      <div class="truncate">
+      <router-link :to="`/edit/${ticket.ticket_id}`" class="block truncate text-black hover:underline">
         {{ ticket?.title }}
-
-      </div>
+      </router-link>
 
       <!-- Tooltip -->
       <div
         class="tooltip-fade absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 group-hover:translate-y-1 transition-all duration-200 delay-150 w-72 bg-gray-900 text-white text-sm rounded-lg p-3 shadow-xl pointer-events-none">
-
         <span class="break-words leading-snug max-h-40 overflow-y-auto">
           <strong class="block text-orange-400 mb-1">รายละเอียด:</strong>
           <span class="text-white text-sm">{{ ticket.description }}</span>
         </span>
-
-        <!-- Tooltip arrow -->
         <div class="tooltip-arrow absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-gray-900 rotate-45 z-[-1]">
         </div>
       </div>
     </td>
+
 
 
 
@@ -117,11 +114,11 @@
       <FileLinks :filePath="ticket.file_path" />
     </td> -->
 
-      <!-- <td class="p-3">
+    <!-- <td class="p-3">
       <router-link :to="`/edit/${ticket.id}`">
         <button class="text-orange-500 hover:underline">แก้ไข</button>
       </router-link>
-    </td>    -->
+    </td>     -->
   </tr>
 
 

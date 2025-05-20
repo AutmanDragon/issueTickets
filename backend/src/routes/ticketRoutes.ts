@@ -92,7 +92,7 @@ router.put('/:id', async (req: Request, res: Response) => {
 
     try {
         await pool.query(
-            'UPDATE tickets SET status = $1 WHERE id = $2',
+            'UPDATE tickets SET status = $1 WHERE ticket_id = $2',
             [status, ticketId]
         );
         res.status(200).json({ message: 'Status updated' });
@@ -115,5 +115,30 @@ router.get('/', async (_req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+
+router.get('/:ticket_id', async (req: Request, res: Response) => {
+  const { ticket_id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM tickets WHERE ticket_id = $1',
+      [ticket_id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Ticket not found' });
+    } else {
+      res.status(200).json(result.rows[0]);
+    }
+  } catch (err) {
+    console.error('Error fetching ticket:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+
 
 export default router;
