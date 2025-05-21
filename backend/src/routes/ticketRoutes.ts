@@ -5,6 +5,7 @@ import { Pool } from 'pg';
 import fs from 'fs';
 import dayjs from 'dayjs';
 
+
 const router = express.Router();
 
 // 🔌 เชื่อมต่อ PostgreSQL
@@ -100,6 +101,9 @@ router.put('/:id', async (req: Request, res: Response) => {
         console.error('Error updating ticket:', err);
         res.status(500).json({ error: 'Failed to update status' });
     }
+
+  
+ 
 });
 
 // 📄 GET /api/tickets - ดึงรายการ ticket ทั้งหมด

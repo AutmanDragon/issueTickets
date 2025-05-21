@@ -1,33 +1,62 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+
 import ticketRoutes from './routes/ticketRoutes';
-
 import notificationsRouter from './routes/notifications';
-
-// import staffnotifications from './routes/Staffnotifications'
 
 const app = express();
 const port = 3000;
+
+// ⏫ สร้าง HTTP server
+const server = http.createServer(app);
+
+// ⏫ สร้าง socket.io instance
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: '*', // ระวังใน production!
+  },
+});
+
+// ⏫ Map เก็บ socket.id ของผู้ใช้แต่ละคน
+const connectedUsers = new Map<number, string>();
+
+// ⏫ จัดการการเชื่อมต่อของ client
+io.on('connection', (socket) => {
+  console.log('✅ Client connected:', socket.id);
+
+  socket.on('register', (userId: number) => {
+    connectedUsers.set(userId, socket.id);
+    console.log(`📌 Registered user ${userId} with socket ${socket.id}`);
+  });
+
+  socket.on('disconnect', () => {
+    for (const [userId, sid] of connectedUsers.entries()) {
+      if (sid === socket.id) {
+        connectedUsers.delete(userId);
+        console.log(`❌ User ${userId} disconnected`);
+        break;
+      }
+    }
+  });
+});
 
 // 🌐 Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// 📂 Serve uploads (เช่น รูปภาพ, ไฟล์เอกสาร)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// 📌 ใช้งาน API: /api/tickets
+// 📌 Routes
 app.use('/api/tickets', ticketRoutes);
-
-// ✅ ใช้งาน notification routes
 app.use('/api/notifications', notificationsRouter);
-console.log('notificationsRouter:', typeof notificationsRouter);
 
-// app.use('/api/staffnotifications', staffnotifications )
+// 🟢 Export WebSocket instance ให้ routes ใช้
+export { io, connectedUsers };
 
-// 🚀 เริ่มต้นเซิร์ฟเวอร์
-app.listen(port, () => {
-    console.log(`✅ Server is running at http://localhost:${port}`);
+// 🚀 Start server
+server.listen(port, () => {
+  console.log(`✅ Server is running at http://localhost:${port}`);
 });

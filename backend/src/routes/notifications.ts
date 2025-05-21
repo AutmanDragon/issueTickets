@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import { Pool } from 'pg';
 
+import { io, connectedUsers } from '../server';
+
 const router = express.Router();
 
 const pool = new Pool({
@@ -41,6 +43,20 @@ router.get('/check-inprogress/:userId', async (req: Request, res: Response) => {
           `INSERT INTO notifications (user_id, ticket_id, message, type, created_at) VALUES ($1, $2, $3, $4, NOW())`,
           [userId, ticket.id, message, 'in_progress_alert']
         );
+
+        // ✅ ส่งผ่าน WebSocket ถ้า user ออนไลน์
+        const socketId = connectedUsers.get(userId);
+        if (socketId) {
+          io.to(socketId).emit('notification:new', {
+            userId,
+            message,
+            ticketId: ticket.id,
+            ticketCode: ticket.ticket_id,
+            type: 'in_progress_alert',
+            timestamp: new Date().toISOString(),
+          });
+        }
+
         newNotifications.push({ ticket_id: ticket.ticket_id, title: ticket.title, message });
       }
     }
@@ -141,15 +157,29 @@ router.get('/check-done/:userId', async (req: Request, res: Response) => {
 
         await pool.query(
           `INSERT INTO notifications (user_id, ticket_id, message, type, created_at)
-           VALUES ($1, $2, $3, $4, NOW())`,
+   VALUES ($1, $2, $3, $4, NOW())`,
           [userId, ticket.id, message, 'done_alert']
         );
+
+        // ✅ ส่งผ่าน WebSocket ถ้า user ออนไลน์
+        const socketId = connectedUsers.get(userId);
+        if (socketId) {
+          io.to(socketId).emit('notification:new', {
+            userId,
+            message,
+            ticketId: ticket.id,
+            ticketCode: ticket.ticket_id,
+            type: 'done_alert',
+            timestamp: new Date().toISOString(),
+          });
+        }
 
         newNotifications.push({
           ticket_id: ticket.ticket_id,
           title: ticket.title,
           message,
         });
+
       }
     }
 

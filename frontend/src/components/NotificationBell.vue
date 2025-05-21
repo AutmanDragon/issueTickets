@@ -91,11 +91,15 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
-import { useToast } from "vue-toastification"
+// import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 
-// const toast = useToast()
+import {io,Socket } from 'socket.io-client'
 
+
+const socket = io('http://localhost:3000'); // ใช้ URL server จริงตอน deploy
+
+// const toast = useToast()
 const showDropdown = ref(false)
 const notifications = ref([])
 const unreadCount = ref(0)
@@ -240,14 +244,33 @@ onMounted(() => {
   fetchNotifications()
   document.addEventListener('click', handleClickOutside)
 
-  setInterval(() => {
-    checkDoneNotifications()
-    checkInProgressNotifications()
-  }, 3000)
+  // ✅ ฟัง event จาก WebSocket
+  socket.on('connect', () => {
+    console.log('🟢 WebSocket connected:', socket.id)
+    // ส่ง userId ไป backend ถ้าต้องการให้เจาะจง user
+    socket.emit('register_user', userId)
+  })
+
+  // ✅ ฟังเมื่อมีแจ้งเตือนใหม่ส่งมาจาก backend
+  socket.on('notification:new', (noti) => {
+    console.log('📥 แจ้งเตือนใหม่:', noti)
+    notifications.value.unshift({
+      id: Date.now(), // ใช้ id ชั่วคราว ถ้ายังไม่มีใน backend
+      message: noti.message,
+      ticketId: noti.ticketId,
+      ticketCode: noti.ticketCode || '',
+      timestamp: new Date().toISOString(),
+      read: false,
+      type: noti.type
+    })
+    unreadCount.value++
+  })
+
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside)
+  socket.disconnect()
 })
 </script>
 

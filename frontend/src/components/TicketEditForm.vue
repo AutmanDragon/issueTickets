@@ -33,7 +33,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
-
+const userId = 4
 
 const route = useRoute()
 const router = useRouter()
@@ -56,7 +56,9 @@ const updateStatus = async () => {
     status: ticket.value.status
   })
   alert('อัปเดตสถานะเรียบร้อยแล้ว')
-  router.push('/') // เปลี่ยนไปหน้า list หรือหน้าหลัก
+  router.push('/reportpage') // เปลี่ยนไปหน้า list หรือหน้าหลัก
+  await axios.get(`http://localhost:3000/api/notifications/check-inprogress/${userId}`); //userid
+  await axios.get(`http://localhost:3000/api/notifications/check-done/${userId}`);
 }
 
 onMounted(fetchTicket)
