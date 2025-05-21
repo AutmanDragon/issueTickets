@@ -7,6 +7,8 @@ import { Server as SocketIOServer } from 'socket.io';
 import ticketRoutes from './routes/ticketRoutes';
 import notificationsRouter from './routes/notifications';
 
+import staffNotificationRoutes from './routes/Staffnotifications'
+
 const app = express();
 const port = 3000;
 
@@ -52,6 +54,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // 📌 Routes
 app.use('/api/tickets', ticketRoutes);
 app.use('/api/notifications', notificationsRouter);
+
+app.use('/api/staff-notifications', staffNotificationRoutes);
+
 
 // 🟢 Export WebSocket instance ให้ routes ใช้
 export { io, connectedUsers };

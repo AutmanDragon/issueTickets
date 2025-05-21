@@ -109,6 +109,9 @@ const router = useRouter()
 
 const userId = 4 // เปลี่ยนให้ dynamic ได้ภายหลัง
 
+
+const isStaff = false
+
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
   if (showDropdown.value) {
@@ -192,6 +195,24 @@ async function checkInProgressNotifications() {
   }
 }
 
+
+async function checkOpenNotifications(){
+  try{
+    const res = await axios.get(`http://localhost:3000/api/staff-notifications/check-open/${userId}`)
+    if (res.data.notify) {
+      fetchNotifications()
+    }
+  }catch (err) {
+    console.error('ตรวจสอบเเจ้งเตือน open ไม่สำเร็จ:', err)
+  }
+}
+
+
+
+
+
+
+
 function getIcon(type) {
   switch (type) {
     case 'in_progress_alert': return 'build'
@@ -265,6 +286,14 @@ onMounted(() => {
     })
     unreadCount.value++
   })
+
+  //เรียก API ตาม role
+  if (isStaff) {
+    checkOpenNotifications()
+  }else {
+    checkInProgressNotifications()
+    checkDoneNotifications()
+  }
 
 })
 
