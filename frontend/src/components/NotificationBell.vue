@@ -107,10 +107,10 @@ const dropdownRef = ref(null)
 
 const router = useRouter()
 
-const userId = 4 // เปลี่ยนให้ dynamic ได้ภายหลัง
+const userId = 2 // เปลี่ยนให้ dynamic ได้ภายหลัง 
 
 
-const isStaff = true
+const isStaff = true // เปลี่ยนให้ dynamic ได้ภายหลัง //อยากเช็ค Telegram staff ให้เปลี่ยน userId =2 เพื่อใช้chatid ในdatabase
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value

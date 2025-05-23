@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { Pool } from 'pg';
+import { sendTelegramMessage } from '../utils/sendTelegram';
 
 const router = express.Router();
 
@@ -46,7 +47,24 @@ router.get('/check-open/:staffId', async (req: Request, res: Response) => {
            VALUES ($1, $2, $3, $4, NOW())`,
           [staffId, ticket.id, msg, 'open_alert']
         );
+
+        // ✅ ส่งผ่าน Telegram ถ้ามี chat_id ของ staff
+        const staffResult = await pool.query(
+          `SELECT telegram_chat_id FROM users WHERE id = $1`,
+          [staffId]
+        );
+        const telegramChatId = staffResult.rows[0]?.telegram_chat_id;
+
+        if (telegramChatId) {
+          await sendTelegramMessage(telegramChatId, msg);
+        }
+
       }
+
+
+
+
+
 
       notifications.push({
         ticket_id: ticket.ticket_id,

@@ -3,6 +3,11 @@ import { Pool } from 'pg';
 
 import { io, connectedUsers } from '../server';
 
+import { sendTelegramMessage } from '../utils/sendTelegram';  //API Telegram
+
+
+
+
 const router = express.Router();
 
 const pool = new Pool({
@@ -15,11 +20,14 @@ const pool = new Pool({
 
 // ✅ ตรวจสอบ tickets ที่ in_progress และสร้าง notifications ใหม่หากยังไม่มี
 router.get('/check-inprogress/:userId', async (req: Request, res: Response) => {
+
   const userId = parseInt(req.params.userId);
+
 
   if (isNaN(userId)) {
     res.status(400).json({ error: 'Invalid user ID' });
     return;
+
   }
 
   try {
@@ -57,7 +65,16 @@ router.get('/check-inprogress/:userId', async (req: Request, res: Response) => {
           });
         }
 
-        newNotifications.push({ ticket_id: ticket.ticket_id, title: ticket.title, message });
+        //ส่งผ่านTelegram ถ้ามี chat_id
+        const userResult = await pool.query(
+          `SELECT telegram_chat_id FROM users WHERE id = $1`,
+          [userId]
+        );
+        const telegramChatId = userResult.rows[0]?.telegram_chat_id;
+
+        if (telegramChatId) {
+          await sendTelegramMessage(telegramChatId, message);
+        }
       }
     }
 
@@ -173,6 +190,18 @@ router.get('/check-done/:userId', async (req: Request, res: Response) => {
             timestamp: new Date().toISOString(),
           });
         }
+
+        // ✅ ส่งผ่าน Telegram ถ้ามี chat_id
+        const userResult = await pool.query(
+          `SELECT telegram_chat_id FROM users WHERE id = $1`,
+          [userId]
+        );
+        const telegramChatId = userResult.rows[0]?.telegram_chat_id;
+
+        if (telegramChatId) {
+          await sendTelegramMessage(telegramChatId, message);
+        }
+
 
         newNotifications.push({
           ticket_id: ticket.ticket_id,
