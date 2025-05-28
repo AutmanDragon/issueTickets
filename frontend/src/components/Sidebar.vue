@@ -17,8 +17,8 @@
 
       
       <button class="flex items-center space-x-2 px-4 py-2 rounded hover:bg-gray-700 transition"
-        :class="{ 'bg-gray-700': route.path === '/Profile' }" @click="setActive('Profile')">
-        <span>X</span>
+        :class="{ 'bg-gray-700': route.path === '/profiles' }" @click="setActive('Profiles')">
+        <span>👤</span>
         <span>Profile</span>
       </button>
 
@@ -38,5 +38,17 @@ const route = useRoute()
 const setActive = (page) => {
   if (page === 'new') router.push('/newticket')
   else if (page === 'report') router.push('/reportpage')
+  else if (page ==='Profiles') router.push('/profiles')
 }
 </script>
+
+
+<style>
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+</style>

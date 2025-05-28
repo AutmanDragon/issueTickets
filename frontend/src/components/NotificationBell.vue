@@ -1,30 +1,26 @@
 <template>
   <div class="relative" ref="dropdownRef">
     <!-- ปุ่มกดเปิด dropdown -->
-    <button @click="toggleDropdown" class="relative">
-      <!-- ไอคอน notifications เด้งเมื่อมีแจ้งเตือน -->
+    <button @click="toggleDropdown" class="relative group transition duration-300 ease-in-out">
+      <!-- ไอคอน notifications -->
       <span
-        class="material-symbols-outlined text-2xl text-gray-700 transition-transform duration-300"
-        :class="unreadCount > 0 ? 'text-red-500 scale-110 animate-bounce' : ''"
-      >
+        class="material-symbols-outlined text-white bg-gray-500 text-xl rounded-full p-1 transition-all duration-300 group-hover:bg-gray-700 group-hover:scale-110 group-hover:drop-shadow-lg"
+        :class="unreadCount > 0 ? 'bg-red-500 animate-bounce' : ''">
         notifications
       </span>
 
-      <!-- ตัวเลขแจ้งเตือนยังไม่อ่าน กระพริบ -->
-      <span
-        v-if="unreadCount > 0"
-        class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow animate-pulse"
-      >
+
+      <!-- ตัวเลขแจ้งเตือนยังไม่อ่าน -->
+      <span v-if="unreadCount > 0"
+        class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow animate-pulse">
         {{ unreadCount }}
       </span>
     </button>
 
     <!-- กล่อง dropdown การแจ้งเตือน -->
     <transition name="fade-slide">
-      <div
-        v-if="showDropdown"
-        class="absolute right-0 mt-2 w-72 bg-white/90 backdrop-blur-sm shadow-lg rounded-lg p-3 z-50"
-      >
+      <div v-if="showDropdown"
+        class="absolute right-0 mt-2 w-72 bg-white/90 backdrop-blur-sm shadow-lg rounded-lg p-3 z-50">
         <h3 class="text-sm font-semibold mb-2">การแจ้งเตือน</h3>
 
         <div v-if="notifications.length > 0" class="max-h-60 overflow-y-auto space-y-2">
@@ -32,26 +28,22 @@
           <template v-if="groupNotificationsByDay().today.length > 0">
             <p class="text-xs text-gray-400 px-2">วันนี้</p>
             <ul>
-              <li
-                v-for="(noti, index) in groupNotificationsByDay().today"
-                :key="noti.id"
+              <li v-for="(noti, index) in groupNotificationsByDay().today" :key="noti.id"
                 class="p-2 rounded cursor-pointer transition hover:bg-gray-100"
-                :class="[
-                  !noti.read ? 'bg-blue-50' : '',
-                  'animate-fadeInUp'
-                ]"
-                :style="{ animationDelay: `${index * 80}ms` }"
-                @click="goToTicket(noti.ticketId)"
-              >
+                :class="[!noti.read ? 'bg-blue-50' : '', 'animate-fadeInUp']"
+                :style="{ animationDelay: `${index * 80}ms` }" @click="goToTicket(noti.ticketId)">
                 <p class="text-sm flex items-center gap-2">
                   <span :class="`material-symbols-outlined text-base ${getIconColor(noti.type)}`">
                     {{ getIcon(noti.type) }}
                   </span>
                   <span>{{ noti.message }}</span>
-                  <span class="text-[11px] text-gray-400" v-if="noti.ticketCode">({{ noti.ticketCode }})</span>
+                  <span class="text-[11px] text-gray-400" v-if="noti.ticketCode">
+                    ({{ noti.ticketCode }})
+                  </span>
                 </p>
-
-                <span class="text-xs text-gray-500">{{ timeAgo(noti.timestamp) }}</span>
+                <span class="text-xs text-gray-500">
+                  {{ timeAgo(noti.timestamp) }}
+                </span>
               </li>
             </ul>
           </template>
@@ -60,33 +52,31 @@
           <template v-if="groupNotificationsByDay().earlier.length > 0">
             <p class="text-xs text-gray-400 px-2 pt-2">ก่อนหน้านี้</p>
             <ul>
-              <li
-                v-for="(noti, index) in groupNotificationsByDay().earlier"
-                :key="noti.id"
+              <li v-for="(noti, index) in groupNotificationsByDay().earlier" :key="noti.id"
                 class="p-2 rounded cursor-pointer transition hover:bg-gray-100"
-                :class="[
-                  !noti.read ? 'bg-blue-50' : '',
-                  'animate-fadeInUp'
-                ]"
-                :style="{ animationDelay: `${index * 80}ms` }"
-                @click="goToTicket(noti.ticketId)"
-              >
+                :class="[!noti.read ? 'bg-blue-50' : '', 'animate-fadeInUp']"
+                :style="{ animationDelay: `${index * 80}ms` }" @click="goToTicket(noti.ticketId)">
                 <p class="text-sm flex items-center gap-2">
                   <span class="material-symbols-outlined text-base text-blue-500">info</span>
                   {{ noti.message }}
                 </p>
-                <span class="text-xs text-gray-500">{{ timeAgo(noti.timestamp) }}</span>
+                <span class="text-xs text-gray-500">
+                  {{ timeAgo(noti.timestamp) }}
+                </span>
               </li>
             </ul>
           </template>
         </div>
 
         <!-- ไม่มีการแจ้งเตือน -->
-        <p v-else class="text-sm text-gray-500 text-center py-4">ไม่มีการแจ้งเตือน</p>
+        <p v-else class="text-sm text-gray-500 text-center py-4">
+          ไม่มีการแจ้งเตือน
+        </p>
       </div>
     </transition>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
@@ -94,7 +84,7 @@ import axios from 'axios'
 // import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 
-import {io,Socket } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 
 
 const socket = io('http://localhost:3000'); // ใช้ URL server จริงตอน deploy
@@ -107,10 +97,10 @@ const dropdownRef = ref(null)
 
 const router = useRouter()
 
-const userId = 2 // เปลี่ยนให้ dynamic ได้ภายหลัง 
+const userId = 4 // เปลี่ยนให้ dynamic ได้ภายหลัง 
 
 
-const isStaff = true // เปลี่ยนให้ dynamic ได้ภายหลัง //อยากเช็ค Telegram staff ให้เปลี่ยน userId =2 เพื่อใช้chatid ในdatabase
+const isStaff = false // เปลี่ยนให้ dynamic ได้ภายหลัง //อยากเช็ค Telegram staff ให้เปลี่ยน userId =2 เพื่อใช้chatid ในdatabase
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
@@ -196,13 +186,13 @@ async function checkInProgressNotifications() {
 }
 
 
-async function checkOpenNotifications(){
-  try{
+async function checkOpenNotifications() {
+  try {
     const res = await axios.get(`http://localhost:3000/api/staff-notifications/check-open/${userId}`)
     if (res.data.notify) {
       fetchNotifications()
     }
-  }catch (err) {
+  } catch (err) {
     console.error('ตรวจสอบเเจ้งเตือน open ไม่สำเร็จ:', err)
   }
 }
@@ -290,7 +280,7 @@ onMounted(() => {
   //เรียก API ตาม role
   if (isStaff) {
     checkOpenNotifications()
-  }else {
+  } else {
     checkInProgressNotifications()
     checkDoneNotifications()
   }
@@ -308,18 +298,22 @@ onBeforeUnmount(() => {
 .fade-slide-leave-active {
   transition: all 0.2s ease;
 }
+
 .fade-slide-enter-from {
   opacity: 0;
   transform: translateY(-10px);
 }
+
 .fade-slide-enter-to {
   opacity: 1;
   transform: translateY(0);
 }
+
 .fade-slide-leave-from {
   opacity: 1;
   transform: translateY(0);
 }
+
 .fade-slide-leave-to {
   opacity: 0;
   transform: translateY(-10px);
@@ -331,11 +325,13 @@ onBeforeUnmount(() => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .animate-fadeInUp {
   animation: fadeInUp 0.4s ease forwards;
 }

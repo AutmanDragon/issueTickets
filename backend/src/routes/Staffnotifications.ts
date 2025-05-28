@@ -38,7 +38,7 @@ router.get('/check-open/:staffId', async (req: Request, res: Response) => {
         [staffId, ticket.id]
       );
 
-      const msg = ` ปัญหาใหม่ รหัส ${ticket.ticket_id} เข้ามาแล้ว`;
+      const msg = ` ปัญหาใหม่รหัส :${ticket.ticket_id} เข้ามาแล้ว!`;
 
       if (rowCount === 0) {
         // ยังไม่มีแจ้งเตือน -> แทรกใหม่

@@ -144,8 +144,8 @@ function removeFile(index) {
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">เลือกเเผนก</option>
           <option value="IT">IT</option>
-          <option value="Seller">Seller</option>
-          <option value="X">x</option>
+          <option value="Sell">Sell</option>
+          <option value="HR">HR</option>
         </select>
       </div>
 
