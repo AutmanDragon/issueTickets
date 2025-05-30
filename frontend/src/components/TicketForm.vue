@@ -48,6 +48,7 @@ const submitForm = async () => {
   formData.append('priority', priority.value)
   formData.append('contact', contact.value)
   formData.append('department', department.value)
+  formData.append('user_id',2) //เเก้ userid ตรงนี้
 
   files.value.forEach((file) => {
     formData.append('files', file)

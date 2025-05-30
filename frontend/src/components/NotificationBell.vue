@@ -97,10 +97,10 @@ const dropdownRef = ref(null)
 
 const router = useRouter()
 
-const userId = 4 // เปลี่ยนให้ dynamic ได้ภายหลัง 
+const userId = 2 // เปลี่ยนให้ dynamic ได้ภายหลัง 
 
 
-const isStaff = false // เปลี่ยนให้ dynamic ได้ภายหลัง //อยากเช็ค Telegram staff ให้เปลี่ยน userId =2 เพื่อใช้chatid ในdatabase
+const isStaff = true // เปลี่ยนให้ dynamic ได้ภายหลัง //อยากเช็ค Telegram staff ให้เปลี่ยน userId =2 เพื่อใช้chatid ในdatabase
 
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
@@ -189,6 +189,7 @@ async function checkInProgressNotifications() {
 async function checkOpenNotifications() {
   try {
     const res = await axios.get(`http://localhost:3000/api/staff-notifications/check-open/${userId}`)
+    console.log(res.data);
     if (res.data.notify) {
       fetchNotifications()
     }
@@ -278,8 +279,11 @@ onMounted(() => {
   })
 
   //เรียก API ตาม role
+
   if (isStaff) {
+    
     checkOpenNotifications()
+
   } else {
     checkInProgressNotifications()
     checkDoneNotifications()

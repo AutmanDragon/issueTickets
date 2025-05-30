@@ -64,7 +64,7 @@ async function generateTicketId(): Promise<string> {
 
 // 📥 POST /api/tickets - รับข้อมูลฟอร์ม + ไฟล์
 router.post('/', uploads.array('files'), async (req: Request, res: Response) => {
-    const { title, description, type, priority, contact, department } = req.body;
+    const { title, description, type, priority, contact, department, user_id } = req.body;
     const uploadFiles = req.files as Express.Multer.File[] || [];
     const filenames = uploadFiles.map(f => f.filename);
 
@@ -73,10 +73,10 @@ router.post('/', uploads.array('files'), async (req: Request, res: Response) => 
 
         const result = await pool.query(
             `INSERT INTO tickets 
-                (ticket_id, title, description, type, priority, contact, department, file_path)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                (ticket_id, title, description, type, priority, contact, department, file_path, user_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              RETURNING *`,
-            [ticketId, title, description, type, priority, contact, department, JSON.stringify(filenames)]
+            [ticketId, title, description, type, priority, contact, department, JSON.stringify(filenames), user_id]
         );
 
         res.status(201).json(result.rows[0]);
